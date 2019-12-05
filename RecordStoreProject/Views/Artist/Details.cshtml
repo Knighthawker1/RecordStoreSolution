@@ -18,6 +18,31 @@
             @Html.DisplayFor(model => model.ArtistName)
         </dd>
 
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Album Name</th>
+                    <th>Album Price</th>
+                </tr>
+                @{int counter = 0; }
+                @foreach (var item in Model.Albums)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AlbumName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AlbumPrice)
+                        </td>
+                    </tr>
+                    counter++;
+                }
+            </table>
+            <p>
+                Mynil Vynil has a total of @counter albums by @Html.DisplayFor(model => model.ArtistName)
+            </p>
+        </dd>
+
     </dl>
 </div>
 <p>

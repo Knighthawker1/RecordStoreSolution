@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using RecordStoreProject.Models;
+using PagedList;
 
 namespace RecordStoreProject.Controllers
 {
@@ -15,10 +16,42 @@ namespace RecordStoreProject.Controllers
         private RecordStoreDatabaseEntities db = new RecordStoreDatabaseEntities();
 
         // GET: Album
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
-            var albums = db.Albums.Include(a => a.Artist).Include(a => a.Genre);
-            return View(albums.ToList());
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.CurrentSort = sortOrder;
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var albums = from a in db.Albums
+                           select a;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                albums = albums.Where(a => a.Genre.GenreName.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    albums = albums.OrderByDescending(a => a.AlbumName);
+                    break;
+                default:
+                    albums = albums.OrderBy(a => a.AlbumName);
+                    break;
+            }
+
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+            return View(albums.ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Album/Details/5
